@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>네이버 블로그 글 생성기</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: #f5f6f8;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #03C75A;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+    }
+
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #333;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      margin-bottom: 12px;
+      resize: vertical;
+    }
+
+    textarea {
+      min-height: 150px;
+    }
+
+    textarea.large {
+      min-height: 250px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #03C75A;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #02B350;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .style-card {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .style-card.show {
+      display: block;
+    }
+
+    .style-item {
+      margin-bottom: 12px;
+    }
+
+    .style-label {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .style-value {
+      background: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+    }
+
+    .store-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .post-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+
+    .post-card:hover {
+      border-color: #03C75A;
+      box-shadow: 0 4px 12px rgba(3, 199, 90, 0.2);
+    }
+
+    .post-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .post-body {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      line-height: 1.8;
+      font-size: 14px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .post-body strong {
+      font-weight: 700;
+      font-size: 1.1em;
+      color: #111;
+    }
+
+    .post-body .photo-placeholder {
+      background: #e0e0e0;
+      color: #666;
+      padding: 8px 12px;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 8px 0;
+      font-size: 13px;
+    }
+
+    .post-hashtags {
+      color: #03C75A;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .progress-bar.show {
+      display: block;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #03C75A, #02B350);
+      transition: width 0.3s;
+      width: 0;
+    }
+
+    .progress-text {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .progress-text.show {
+      display: block;
+    }
+
+    .counter {
+      display: inline-block;
+      background: #03C75A;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #03C75A;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .store-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>✍️ 네이버 블로그 글 생성기</h1>
+      <p class="subtitle">AI가 당신의 스타일로 블로그 글을 작성해드립니다</p>
+    </header>
+
+    <!-- 1. 참고 글 입력 -->
+    <div class="section">
+      <h2 class="section-title">1️⃣ 참고 글 붙여넣기</h2>
+      <textarea id="referencePosts" class="large" placeholder="기존에 작성한 블로그 글 2~3편을 붙여넣으세요. AI가 당신의 스타일을 분석합니다."></textarea>
+      <button class="btn btn-primary" onclick="analyzeStyle()">
+        <span id="analyzeText">스타일 분석</span>
+      </button>
+    </div>
+
+    <!-- 2. 스타일 카드 -->
+    <div class="section">
+      <h2 class="section-title">2️⃣ 분석된 스타일</h2>
+      <div id="styleCard" class="style-card">
+        <div class="style-item">
+          <div class="style-label">말투</div>
+          <input type="text" id="tone" class="style-value" onchange="saveStyle()">
+        </div>
+        <div class="style-item">
+          <div class="style-label">소제목 개수와 형태</div>
+          <input type="text" id="subheadings" class="style-value" onchange="saveStyle()">
+        </div>
+        <div class="style-item">
+          <div class="style-label">문단 길이</div>
+          <input type="text" id="paragraphLength" class="style-value" onchange="saveStyle()">
+        </div>
+        <div class="style-item">
+          <div class="style-label">사진 들어가는 자리</div>
+          <input type="text" id="photoPlacement" class="style-value" onchange="saveStyle()">
+        </div>
+        <div class="style-item">
+          <div class="style-label">해시태그 개수</div>
+          <input type="text" id="hashtagCount" class="style-value" onchange="saveStyle()">
+        </div>
+        <div class="style-item">
+          <div class="style-label">도입부 공식</div>
+          <input type="text" id="introFormula" class="style-value" onchange="saveStyle()">
+        </div>
+        <div class="style-item">
+          <div class="style-label">마무리 공식</div>
+          <input type="text" id="closingFormula" class="style-value" onchange="saveStyle()">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 가게 정보 -->
+    <div class="section">
+      <h2 class="section-title">3️⃣ 내 가게 정보</h2>
+      <div class="store-info-grid">
+        <div>
+          <input type="text" id="storeName" placeholder="상호명" onchange="saveStoreInfo()">
+        </div>
+        <div>
+          <input type="text" id="storeType" placeholder="업종 (예: 카페, 식당)" onchange="saveStoreInfo()">
+        </div>
+        <div>
+          <input type="text" id="storeLocation" placeholder="지역 (예: 강남역)" onchange="saveStoreInfo()">
+        </div>
+        <div>
+          <input type="text" id="storeHighlights" placeholder="강조하고 싶은 점" onchange="saveStoreInfo()">
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 키워드 입력 -->
+    <div class="section">
+      <h2 class="section-title">4️⃣ 키워드 입력</h2>
+      <textarea id="keywords" placeholder="키워드를 한 줄에 하나씩 입력하세요&#10;예:&#10;강남 맛집&#10;데이트 카페&#10;브런치 추천"></textarea>
+      <button class="btn btn-primary" onclick="generatePosts()" id="generateBtn">
+        <span id="generateText">글 생성</span>
+      </button>
+    </div>
+
+    <!-- 5. 결과 영역 -->
+    <div class="section">
+      <h2 class="section-title">5️⃣ 생성된 글</h2>
+
+      <div id="counter" style="display: none;">
+        <span class="counter">📝 생성된 글: <span id="postCount">0</span>편</span>
+      </div>
+
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text" id="progressText"></div>
+
+      <div id="resultsContainer"></div>
+
+      <button class="btn btn-secondary" onclick="downloadAll()" id="downloadAllBtn" style="display: none;">
+        📥 전체 다운로드 (.md)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let generatedPosts = [];
+    let styleData = {};
+
+    // 페이지 로드 시 localStorage에서 불러오기
+    window.onload = function() {
+      loadStyle();
+      loadStoreInfo();
+    };
+
+    // 스타일 분석
+    async function analyzeStyle() {
+      const referencePosts = document.getElementById('referencePosts').value.trim();
+
+      if (!referencePosts) {
+        alert('참고 글을 입력해주세요.');
+        return;
+      }
+
+      const analyzeBtn = document.querySelector('#analyzeText').parentElement;
+      const analyzeText = document.getElementById('analyzeText');
+      analyzeText.innerHTML = '분석 중... <span class="loading"></span>';
+      analyzeBtn.disabled = true;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/analyze-style', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ referencePosts })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          alert('오류: ' + data.error);
+          return;
+        }
+
+        // 스타일 카드에 표시
+        document.getElementById('tone').value = data.tone || '';
+        document.getElementById('subheadings').value = data.subheadings || '';
+        document.getElementById('paragraphLength').value = data.paragraphLength || '';
+        document.getElementById('photoPlacement').value = data.photoPlacement || '';
+        document.getElementById('hashtagCount').value = data.hashtagCount || '';
+        document.getElementById('introFormula').value = data.introFormula || '';
+        document.getElementById('closingFormula').value = data.closingFormula || '';
+
+        document.getElementById('styleCard').classList.add('show');
+        saveStyle();
+        alert('✅ 스타일 분석 완료!');
+
+      } catch (err) {
+        alert('오류가 발생했습니다: ' + err.message);
+      } finally {
+        analyzeText.textContent = '스타일 분석';
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    // 스타일 저장
+    function saveStyle() {
+      styleData = {
+        tone: document.getElementById('tone').value,
+        subheadings: document.getElementById('subheadings').value,
+        paragraphLength: document.getElementById('paragraphLength').value,
+        photoPlacement: document.getElementById('photoPlacement').value,
+        hashtagCount: document.getElementById('hashtagCount').value,
+        introFormula: document.getElementById('introFormula').value,
+        closingFormula: document.getElementById('closingFormula').value
+      };
+      localStorage.setItem('blogStyle', JSON.stringify(styleData));
+    }
+
+    // 스타일 불러오기
+    function loadStyle() {
+      const saved = localStorage.getItem('blogStyle');
+      if (saved) {
+        styleData = JSON.parse(saved);
+        document.getElementById('tone').value = styleData.tone || '';
+        document.getElementById('subheadings').value = styleData.subheadings || '';
+        document.getElementById('paragraphLength').value = styleData.paragraphLength || '';
+        document.getElementById('photoPlacement').value = styleData.photoPlacement || '';
+        document.getElementById('hashtagCount').value = styleData.hashtagCount || '';
+        document.getElementById('introFormula').value = styleData.introFormula || '';
+        document.getElementById('closingFormula').value = styleData.closingFormula || '';
+        document.getElementById('styleCard').classList.add('show');
+      }
+    }
+
+    // 가게 정보 저장
+    function saveStoreInfo() {
+      const storeInfo = {
+        name: document.getElementById('storeName').value,
+        type: document.getElementById('storeType').value,
+        location: document.getElementById('storeLocation').value,
+        highlights: document.getElementById('storeHighlights').value
+      };
+      localStorage.setItem('storeInfo', JSON.stringify(storeInfo));
+    }
+
+    // 가게 정보 불러오기
+    function loadStoreInfo() {
+      const saved = localStorage.getItem('storeInfo');
+      if (saved) {
+        const storeInfo = JSON.parse(saved);
+        document.getElementById('storeName').value = storeInfo.name || '';
+        document.getElementById('storeType').value = storeInfo.type || '';
+        document.getElementById('storeLocation').value = storeInfo.location || '';
+        document.getElementById('storeHighlights').value = storeInfo.highlights || '';
+      }
+    }
+
+    // 글 생성 (순차적)
+    async function generatePosts() {
+      const keywords = document.getElementById('keywords').value.trim().split('\n').filter(k => k.trim());
+
+      if (keywords.length === 0) {
+        alert('키워드를 입력해주세요.');
+        return;
+      }
+
+      if (!styleData.tone) {
+        alert('먼저 스타일 분석을 해주세요.');
+        return;
+      }
+
+      const storeInfo = {
+        name: document.getElementById('storeName').value,
+        type: document.getElementById('storeType').value,
+        location: document.getElementById('storeLocation').value,
+        highlights: document.getElementById('storeHighlights').value
+      };
+
+      if (!storeInfo.name || !storeInfo.type) {
+        alert('가게 정보를 입력해주세요.');
+        return;
+      }
+
+      // UI 초기화
+      document.getElementById('generateBtn').disabled = true;
+      document.getElementById('generateText').innerHTML = '생성 중... <span class="loading"></span>';
+      document.getElementById('progressBar').classList.add('show');
+      document.getElementById('progressText').classList.add('show');
+      generatedPosts = [];
+      document.getElementById('resultsContainer').innerHTML = '';
+      document.getElementById('counter').style.display = 'block';
+      document.getElementById('postCount').textContent = '0';
+
+      // 순차적으로 생성
+      for (let i = 0; i < keywords.length; i++) {
+        const keyword = keywords[i].trim();
+        const progress = ((i) / keywords.length) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('progressText').textContent = `${i + 1}편 생성 중... (${i}/${keywords.length})`;
+
+        try {
+          const response = await fetch('http://localhost:3000/api/generate-post', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keyword, style: styleData, storeInfo })
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            console.error('Error for keyword:', keyword, data.error);
+            continue;
+          }
+
+          generatedPosts.push(data);
+          displayPost(data, generatedPosts.length);
+          document.getElementById('postCount').textContent = generatedPosts.length;
+
+        } catch (err) {
+          console.error('Error generating post:', err);
+        }
+      }
+
+      // 완료
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('progressText').textContent = `✅ 생성 완료! (${generatedPosts.length}편)`;
+      document.getElementById('generateBtn').disabled = false;
+      document.getElementById('generateText').textContent = '글 생성';
+      document.getElementById('downloadAllBtn').style.display = 'block';
+
+      setTimeout(() => {
+        document.getElementById('progressBar').classList.remove('show');
+      }, 2000);
+    }
+
+    // 포스트 카드 표시
+    function displayPost(post, index) {
+      const card = document.createElement('div');
+      card.className = 'post-card';
+
+      // 본문 HTML 포매팅
+      const formattedBody = formatBodyHtml(post.body);
+
+      card.innerHTML = `
+        <div class="post-title">${escapeHtml(post.title)}</div>
+        <div class="post-body">${formattedBody}</div>
+        <div class="post-hashtags">${post.hashtags.map(tag => '#' + tag).join(' ')}</div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="copyTitle(${index - 1})">📋 제목 복사</button>
+          <button class="btn btn-primary" onclick="copyBody(${index - 1})">📝 본문 복사</button>
+          <button class="btn btn-secondary" onclick="copyHashtags(${index - 1})">🏷️ 태그 복사</button>
+        </div>
+      `;
+      document.getElementById('resultsContainer').appendChild(card);
+    }
+
+    // 본문을 HTML로 포매팅
+    function formatBodyHtml(body) {
+      let html = body;
+
+      // [사진] 표시를 회색 배경으로
+      html = html.replace(/\[사진[^\]]*\]/g, (match) => {
+        return `<span class="photo-placeholder">${match}</span>`;
+      });
+
+      // 줄바꿈을 <br>로
+      html = html.replace(/\n/g, '<br>');
+
+      // **굵게** 또는 제목 표시를 <strong>으로
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+      return html;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // 제목 복사 (순수 텍스트)
+    function copyTitle(index) {
+      const post = generatedPosts[index];
+      navigator.clipboard.writeText(post.title).then(() => {
+        alert('✅ 제목이 복사되었습니다!');
+      });
+    }
+
+    // 본문 복사 (text/html + text/plain)
+    async function copyBody(index) {
+      const post = generatedPosts[index];
+
+      // HTML 포맷
+      let html = '<div>';
+
+      // 본문을 줄바꿈과 포맷팅 처리
+      let bodyHtml = post.body;
+
+      // [사진] 표시를 회색 배경으로
+      bodyHtml = bodyHtml.replace(/\[사진[^\]]*\]/g, (match) => {
+        return `<span style="background-color: #e0e0e0; color: #666; padding: 8px 12px; border-radius: 4px; display: inline-block; margin: 8px 0; font-size: 13px;">${match}</span>`;
+      });
+
+      // 줄바꿈을 <br>로
+      bodyHtml = bodyHtml.replace(/\n\n/g, '</p><p style="margin: 12px 0;">');
+      bodyHtml = bodyHtml.replace(/\n/g, '<br>');
+      bodyHtml = '<p style="margin: 12px 0;">' + bodyHtml + '</p>';
+
+      // **굵게** 표시를 <strong>으로
+      bodyHtml = bodyHtml.replace(/\*\*([^*]+)\*\*/g, '<strong style="font-weight: 700; font-size: 1.1em;">$1</strong>');
+
+      html += bodyHtml;
+      html += '</div>';
+
+      // 순수 텍스트 버전
+      const plainText = post.body;
+
+      // ClipboardItem으로 두 형식 동시 복사
+      try {
+        const clipboardItem = new ClipboardItem({
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([plainText], { type: 'text/plain' })
+        });
+
+        await navigator.clipboard.write([clipboardItem]);
+        alert('✅ 본문이 복사되었습니다!\n네이버 에디터에 붙여넣으면 서식이 유지됩니다.');
+      } catch (err) {
+        // 폴백: 텍스트만 복사
+        navigator.clipboard.writeText(plainText).then(() => {
+          alert('✅ 본문이 복사되었습니다!');
+        });
+      }
+    }
+
+    // 해시태그 복사
+    function copyHashtags(index) {
+      const post = generatedPosts[index];
+      const tags = post.hashtags.map(tag => '#' + tag).join(' ');
+
+      navigator.clipboard.writeText(tags).then(() => {
+        alert('✅ 해시태그가 복사되었습니다!');
+      });
+    }
+
+    // 전체 다운로드 (마크다운 형식)
+    function downloadAll() {
+      let content = '';
+
+      generatedPosts.forEach((post, index) => {
+        content += `# ${post.title}\n\n`;
+        content += `${post.body}\n\n`;
+        content += `---\n\n`;
+        content += `${post.hashtags.map(tag => '#' + tag).join(' ')}\n\n`;
+        content += `\n---\n\n`;  // 글 사이 구분선
+      });
+
+      const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `블로그글_${new Date().toISOString().slice(0,10)}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
